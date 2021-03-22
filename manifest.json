@@ -1,0 +1,9 @@
+{
+  "domain": "blink1_light",
+  "name": "Blink(1) Status Light",
+  "documentation": "",
+  "dependencies": [],
+  "codeowners": [],
+  "requirements": ["blink1"],
+  "version": "0.1.0"
+}

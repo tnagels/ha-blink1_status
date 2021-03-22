@@ -1,0 +1,7 @@
+{
+  "name": "Blink(1) Status Light",
+  "content_in_root": true,
+  "domains": ["light"],
+  "persistent_directory": "config",
+  "iot_class": ["Local Polling"]
+}
