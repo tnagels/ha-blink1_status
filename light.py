@@ -1,32 +1,32 @@
 """Blink(1) Status Light integration."""
 import logging
 
-import awesomelights
+from blink1.blink1 import blink1
 import voluptuous as vol
 
 import homeassistant.helpers.config_validation as cv
 # Import the device class from the component that you want to support
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS, PLATFORM_SCHEMA, Light)
-from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
+#from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
 
 _LOGGER = logging.getLogger(__name__)
 
 # Validation of the user's configuration
-PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
-    vol.Required(CONF_HOST): cv.string,
-    vol.Optional(CONF_USERNAME, default='admin'): cv.string,
-    vol.Optional(CONF_PASSWORD): cv.string,
-})
+#PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
+#    vol.Required(CONF_HOST): cv.string,
+#    vol.Optional(CONF_USERNAME, default='admin'): cv.string,
+#    vol.Optional(CONF_PASSWORD): cv.string,
+#})
 
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the Awesome Light platform."""
     # Assign configuration variables.
     # The configuration check takes care they are present.
-    host = config[CONF_HOST]
-    username = config[CONF_USERNAME]
-    password = config.get(CONF_PASSWORD)
+#    host = config[CONF_HOST]
+#    username = config[CONF_USERNAME]
+#    password = config.get(CONF_PASSWORD)
 
     # Setup connection with devices/cloud
     hub = awesomelights.Hub(host, username, password)
@@ -46,9 +46,14 @@ class AwesomeLight(Light):
     def __init__(self, light):
         """Initialize an AwesomeLight."""
         self._light = light
-        self._name = light.name
+        self._name = "Blink1"
         self._state = None
-        self._brightness = None
+        self._brightness = 0
+
+    @property
+    def supported_features(self):
+        """Flag supported features."""
+        return SUPPORT_BRIGHTNESS
 
     @property
     def name(self):
@@ -71,22 +76,14 @@ class AwesomeLight(Light):
 
     def turn_on(self, **kwargs):
         """Instruct the light to turn on.
-
-        You can skip the brightness part if your light does not support
-        brightness control.
         """
-        self._light.brightness = kwargs.get(ATTR_BRIGHTNESS, 255)
-        self._light.turn_on()
+        self._state = true;
+        self._brightness = kwargs.get(ATTR_BRIGHTNESS, 255)
+#        self._light.turn_on()
 
     def turn_off(self, **kwargs):
         """Instruct the light to turn off."""
-        self._light.turn_off()
+        self.state = false;
 
     def update(self):
-        """Fetch new state data for this light.
-
-        This is the only method that should fetch new data for Home Assistant.
-        """
-        self._light.update()
-        self._state = self._light.is_on()
-        self._brightness = self._light.brightness
+        """There is not data to get as we use an assumed state."""
