@@ -23,7 +23,7 @@ _LOGGER = logging.getLogger(__name__)
 def setup_platform(hass, config, add_entities, discovery_info=None):
     # Add devices
     b1 = Blink1()
-    add_entities([blinkOneLight(b1)])
+    add_entities([blink1(b1)])
 
 
 class blink1(LightEntity):
