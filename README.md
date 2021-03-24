@@ -11,5 +11,5 @@ Add the following entry in your `configuration.yaml`:
 
 ```yaml
 light:
-  - platform: blink1_light
+  - platform: blink1
 ```
