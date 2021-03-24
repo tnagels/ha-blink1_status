@@ -26,7 +26,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     add_entities([blinkOneLight(b1)])
 
 
-class blinkOneLight(LightEntity):
+class blink1(LightEntity):
     """Representation of a BlinkLight Light."""
 
     def __init__(self, light):
