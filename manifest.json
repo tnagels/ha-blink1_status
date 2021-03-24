@@ -1,5 +1,5 @@
 {
-  "domain": "blink1",
+  "domain": "blink1_status",
   "name": "Blink(1) Status Light",
   "documentation": "",
   "dependencies": [],
