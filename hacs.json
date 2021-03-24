@@ -1,7 +1,5 @@
 {
   "name": "Blink(1) Status Light",
-  "content_in_root": false,
   "domains": ["light"],
-  "persistent_directory": "config",
   "iot_class": ["Assumed State"]
 }
