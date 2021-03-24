@@ -1,59 +1,51 @@
 """Blink(1) Status Light integration."""
 import logging
 
-from blink1.blink1 import blink1
+from blink1.blink1 import Blink1
 import voluptuous as vol
 
 import homeassistant.helpers.config_validation as cv
+import homeassistant.util.color as color_util
+
 # Import the device class from the component that you want to support
 from homeassistant.components.light import (
-    ATTR_BRIGHTNESS, PLATFORM_SCHEMA, Light)
-#from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
+    ATTR_BRIGHTNESS,
+    ATTR_HS_COLOR,
+    SUPPORT_BRIGHTNESS,
+    SUPPORT_COLOR,
+    PLATFORM_SCHEMA,
+    LightEntity,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
-# Validation of the user's configuration
-#PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
-#    vol.Required(CONF_HOST): cv.string,
-#    vol.Optional(CONF_USERNAME, default='admin'): cv.string,
-#    vol.Optional(CONF_PASSWORD): cv.string,
-#})
-
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
-    """Set up the Awesome Light platform."""
-    # Assign configuration variables.
-    # The configuration check takes care they are present.
-#    host = config[CONF_HOST]
-#    username = config[CONF_USERNAME]
-#    password = config.get(CONF_PASSWORD)
-
-    # Setup connection with devices/cloud
-    hub = awesomelights.Hub(host, username, password)
-
-    # Verify that passed in configuration works
-    if not hub.is_valid_login():
-        _LOGGER.error("Could not connect to AwesomeLight hub")
-        return
-
     # Add devices
-    add_entities(AwesomeLight(light) for light in hub.lights())
+    b1 = Blink1()
+    add_entities([blinkOneLight(b1)])
 
 
-class AwesomeLight(Light):
-    """Representation of an Awesome Light."""
+class blinkOneLight(LightEntity):
+    """Representation of a BlinkLight Light."""
 
     def __init__(self, light):
         """Initialize an AwesomeLight."""
         self._light = light
         self._name = "Blink1"
         self._state = None
+        self._hs_color = [0, 0]
         self._brightness = 0
+
+    @property
+    def brightness(self):
+        """Read back the brightness of the light."""
+        return self._brightness
 
     @property
     def supported_features(self):
         """Flag supported features."""
-        return SUPPORT_BRIGHTNESS
+        return SUPPORT_BRIGHTNESS | SUPPORT_COLOR
 
     @property
     def name(self):
@@ -61,13 +53,9 @@ class AwesomeLight(Light):
         return self._name
 
     @property
-    def brightness(self):
-        """Return the brightness of the light.
-
-        This method is optional. Removing it indicates to Home Assistant
-        that brightness is not supported for this light.
-        """
-        return self._brightness
+    def hs_color(self):
+        """Return the color of this light."""
+        return self._hs_color
 
     @property
     def is_on(self):
@@ -75,15 +63,21 @@ class AwesomeLight(Light):
         return self._state
 
     def turn_on(self, **kwargs):
-        """Instruct the light to turn on.
-        """
-        self._state = true;
-        self._brightness = kwargs.get(ATTR_BRIGHTNESS, 255)
-#        self._light.turn_on()
+        """Instruct the light to turn on."""
+        if ATTR_HS_COLOR in kwargs:
+            self._hs_color = kwargs[ATTR_HS_COLOR]
+        if ATTR_BRIGHTNESS in kwargs:
+            self._brightness = kwargs[ATTR_BRIGHTNESS]
+        self._state = True
+        rgb_color = color_util.color_hsv_to_RGB(
+            self._hs_color[0], self._hs_color[1], self._brightness / 255 * 100
+        )
+        self._light.fade_to_color(100, rgb_color)
 
     def turn_off(self, **kwargs):
         """Instruct the light to turn off."""
-        self.state = false;
+        self._state = False
+        self._light.fade_to_rgb(100, 0, 0, 0)
 
     def update(self):
         """There is not data to get as we use an assumed state."""
