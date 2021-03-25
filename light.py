@@ -1,7 +1,6 @@
 """Blink(1) Status Light integration."""
 import logging
 
-from blink1.blink1 import Blink1
 import voluptuous as vol
 
 import homeassistant.helpers.config_validation as cv
@@ -22,6 +21,7 @@ _LOGGER = logging.getLogger(__name__)
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     # Add devices
+    from blink1.blink1 import Blink1
     b1 = Blink1()
     add_entities([blink1_status(b1)])
 
@@ -69,15 +69,15 @@ class blink1_status(LightEntity):
         if ATTR_BRIGHTNESS in kwargs:
             self._brightness = kwargs[ATTR_BRIGHTNESS]
         self._state = True
-        rgb_color = color_util.color_hsv_to_RGB(
-            self._hs_color[0], self._hs_color[1], self._brightness / 255 * 100
-        )
-        self._light.fade_to_color(100, rgb_color)
+        rgb_color = color_util.color_hsv_to_RGB(self._hs_color[0], self._hs_color[1], self._brightness / 255 * 100)
+        hex_color = "#" + color_util.color_rgb_to_hex(*rgb_color)
+        self._light.fade_to_rgb(100, *rgb_color)
+
 
     def turn_off(self, **kwargs):
         """Instruct the light to turn off."""
         self._state = False
-        self._light.fade_to_rgb(100, 0, 0, 0)
+        self._light.off()
 
     def update(self):
         """There is not data to get as we use an assumed state."""
